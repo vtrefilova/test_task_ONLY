@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useForm } from "react-hook-form";
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import styled from 'styled-components';
+import img from '../images/ONLY..svg';
+import errorIcon from '../images/Ellipse 1.svg';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { history } from '_helpers';
@@ -9,63 +10,162 @@ import { authActions } from '_store';
 
 export { Login };
 
-function Login() {
+const Login = () => {
+    const { register, handleSubmit, formState: {errors, isSubmitting}, reset } = useForm();
+
     const dispatch = useDispatch();
     const authUser = useSelector(x => x.auth.user);
     const authError = useSelector(x => x.auth.error);
 
     useEffect(() => {
         // redirect to home if already logged in
-        if (authUser) history.navigate('/');
+        if (authUser) {
+            history.navigate('/');}
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // form validation rules 
-    const validationSchema = Yup.object().shape({
-        username: Yup.string().required('Username is required'),
-        password: Yup.string().required('Password is required')
-    });
-    const formOptions = { resolver: yupResolver(validationSchema) };
+    const onSubmit = handleSubmit((data) => {
+            const login = data.login;
+            const password = data.password;
+            console.log(data);
+            return dispatch(authActions.login({ login, password }));
+        })
+    
+    return (
+        <>
+            <StyledImg className='logo' src={img}/>
+            <StyledForm onSubmit={onSubmit}>
+            {authError && <StyledError>{authError.message}</StyledError>}
+                <div className='input-block'>
+                    <label htmlFor="login">Логин</label>
+                    <StyledInput
+                        error={errors.login}
+                        type="text" { ...register("login", {
+                            required: "Обязательное поле",
+                            pattern: {
+                                value: /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
+                                message: "Ввведите email в формате test.user@example.com"
+                            }
+                        }) 
+                        } >
+                    </StyledInput>
+                </div>
+                <p>{ errors.login?.message }</p>
+                <div className='input-block'>
+                    <label htmlFor="Password">Пароль</label>
+                    <StyledInput error={errors.password} type="password" {...register("password", { required: "Обязательное поле"})}></StyledInput>
+                </div>
+                <p>{ errors.password?.message }</p>
+                <div className='checkbox-block'>
+                    <input type="checkbox"/>
+                    <label htmlFor="">Запомнить пароль</label>
+                </div>
+                <button disabled={isSubmitting} type="submit">
+                {isSubmitting && <span className="spinner-border spinner-border-sm mr-1"></span>}
+                    Войти
+                </button>
+            </StyledForm>
+        </>
+    );
+}
 
-    // get functions to build form with useForm() hook
-    const { register, handleSubmit, formState } = useForm(formOptions);
-    const { errors, isSubmitting } = formState;
-
-    function onSubmit({ username, password }) {
-        return dispatch(authActions.login({ username, password }));
+const StyledForm = styled.form`
+    @font-face {
+        font-family: 'Helvetica Neue';
+        font-style: normal;
+        src: url('../fonts/DigitalNumbers-Regular.woff') format('otf'),
+    };
+    display: flex;
+    flex-direction: column;
+    width 35.5%;
+    & > p {
+        font-family: 'Helvetica Neue';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        color: #E26F6F;
+    }
+    & .input-block {
+        display: flex;
+        flex-direction: column;
+        & > label {
+            font-family: 'Helvetica Neue';
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            color: #1F1F1F;
+            margin-bottom: 10px;
+        }
+    }
+    & .checkbox-block {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 20px;
+        & > input {
+            border: 1px solid #000000;
+            border-radius: 4px;
+            margin-right: 14px;
+        }
+        & > label {
+            font-family: 'Helvetica Neue';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 19px;
+            color: #1F1F1F;
+        }
+    }
+    & > button {
+        background: #4A67FF;
+        border-radius: 8px;
+        border: none;
+        font-family: 'Helvetica Neue';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 18px;
+        line-height: 22px;
+        color: #FFFFFF;
+        padding: 19px 0px;
+        width: 100%;
     }
 
-    return (
-        <div className="col-md-6 offset-md-3 mt-5">
-            <div className="alert alert-info">
-                Username: test<br />
-                Password: test
-            </div>
-            <div className="card">
-                <h4 className="card-header">Login</h4>
-                <div className="card-body">
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="form-group">
-                            <label>Username</label>
-                            <input name="username" type="text" {...register('username')} className={`form-control ${errors.username ? 'is-invalid' : ''}`} />
-                            <div className="invalid-feedback">{errors.username?.message}</div>
-                        </div>
-                        <div className="form-group">
-                            <label>Password</label>
-                            <input name="password" type="password" {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
-                            <div className="invalid-feedback">{errors.password?.message}</div>
-                        </div>
-                        <button disabled={isSubmitting} className="btn btn-primary">
-                            {isSubmitting && <span className="spinner-border spinner-border-sm mr-1"></span>}
-                            Login
-                        </button>
-                        {authError &&
-                            <div className="alert alert-danger mt-3 mb-0">{authError.message}</div>
-                        }
-                    </form>
-                </div>
-            </div>
-        </div>
-    )
+`
+
+const StyledInput = styled.input`
+    background: #F5F5F5;
+    border-radius: 8px;
+    border: ${props => props.error ? '1px solid #E26F6F' : 'none'};
+    padding: 20px;
+    caret-color: ${props => props.error ? '#E26F6F' : '#1F1F1F'};
+    &:focus {
+        outline: none};
+    }
+`
+const StyledImg = styled.img`
+    top: 0;
+    margin-top: 40px;
+    position: fixed;
+`
+
+const StyledError = styled.div`
+    background-image: ${errorIcon};
+    font-family: 'Helvetica Neue';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: #000000;
+    background: #F5E9E9;
+    border: 1px solid #E26F6F;
+    border-radius: 8px;
+    padding: 21px 0px 22px 54px;
+    margin-bottom: 27px;
+    display: flex;
+    align-items: center;
+`
+export const CustomInput = (props) => {
+    return <StyledInput {...props}/>
 }

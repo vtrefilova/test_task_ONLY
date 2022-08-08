@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
 
 import { authActions } from '_store';
 
@@ -14,11 +14,25 @@ function Nav() {
     if (!authUser) return null;
     
     return (
-        <nav className="navbar navbar-expand navbar-dark bg-dark">
-            <div className="navbar-nav">
-                <NavLink to="/" className="nav-item nav-link">Home</NavLink>
-                <button onClick={logout} className="btn btn-link nav-item nav-link">Logout</button>
-            </div>
-        </nav>
+        <StyledButton onClick={logout} >Выйти</StyledButton>
     );
 }
+
+const StyledButton = styled.button`
+    @font-face {
+        font-family: 'Helvetica Neue';
+        font-style: normal;
+        src: url('../fonts/DigitalNumbers-Regular.woff') format('otf'),
+    };
+    border: 0;
+    background: #F5F5F5;
+    border-radius: 8px;
+    font-family: 'Helvetica Neue';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 22px;
+    color: #000000;
+    padding: 19px 71px;
+
+`

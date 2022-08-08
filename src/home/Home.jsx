@@ -1,35 +1,31 @@
-import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-
-import { userActions } from '_store';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
+import img from '../images/ONLY..svg';
 
 export { Home };
 
 function Home() {
-    const dispatch = useDispatch();
     const { user: authUser } = useSelector(x => x.auth);
-    const { users } = useSelector(x => x.users);
-
-    useEffect(() => {
-        dispatch(userActions.getAll());
-        
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     return (
-        <div>
-            <h1>Hi {authUser?.firstName}!</h1>
-            <p>You're logged in with React 18 + Redux & JWT!!</p>
-            <h3>Users from secure api end point:</h3>
-            {users.length &&
-                <ul>
-                    {users.map(user =>
-                        <li key={user.id}>{user.firstName} {user.lastName}</li>
-                    )}
-                </ul>
-            }
-            {users.loading && <div className="spinner-border spinner-border-sm"></div>}
-            {users.error && <div className="text-danger">Error loading users: {users.error.message}</div>}
-        </div>
+        <>
+            <StyledImg className='logo' src={img}/>
+            <StyledText>Здравствуйте, <b>{authUser?.login}</b></StyledText>
+        </>
     );
 }
+
+const StyledText = styled.h1`
+    font-family: 'Helvetica Neue';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 48px;
+`
+
+const StyledImg = styled.img`
+    top: 0;
+    margin-top: 40px;
+    position: fixed;
+`
+

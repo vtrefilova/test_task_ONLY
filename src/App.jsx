@@ -14,9 +14,8 @@ function App() {
     history.location = useLocation();
 
     return (
-        <div className="app-container bg-light">
-            <Nav />
-            <div className="container pt-4 pb-4">
+        <div className="app-container">
+            <div className="container">
                 <Routes>
                 <Route
                         path="/"
@@ -30,6 +29,7 @@ function App() {
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </div>
+            <Nav />
         </div>
     );
 }
