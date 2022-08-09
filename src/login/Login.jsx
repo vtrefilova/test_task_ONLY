@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import styled from 'styled-components';
 import img from '../images/ONLY..svg';
-import errorIcon from '../images/Ellipse 1.svg';
+import errorIcon from '../images/Ellipse.svg';
 import { useSelector, useDispatch } from 'react-redux';
+import Checkbox from '../_components/Checkbox';
 
 import { history } from '_helpers';
 import { authActions } from '_store';
@@ -11,7 +12,7 @@ import { authActions } from '_store';
 export { Login };
 
 const Login = () => {
-    const { register, handleSubmit, formState: {errors, isSubmitting}, reset } = useForm();
+    const { register, handleSubmit, formState: {errors, isSubmitting}} = useForm();
 
     const dispatch = useDispatch();
     const authUser = useSelector(x => x.auth.user);
@@ -22,13 +23,9 @@ const Login = () => {
         if (authUser) {
             history.navigate('/');}
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const onSubmit = handleSubmit((data) => {
-            const login = data.login;
-            const password = data.password;
-            console.log(data);
+    const onSubmit = handleSubmit(({ login, password }) => {
             return dispatch(authActions.login({ login, password }));
         })
     
@@ -58,11 +55,10 @@ const Login = () => {
                 </div>
                 <p>{ errors.password?.message }</p>
                 <div className='checkbox-block'>
-                    <input type="checkbox"/>
+                    <Checkbox/>
                     <label htmlFor="">Запомнить пароль</label>
                 </div>
                 <button disabled={isSubmitting} type="submit">
-                {isSubmitting && <span className="spinner-border spinner-border-sm mr-1"></span>}
                     Войти
                 </button>
             </StyledForm>
@@ -104,11 +100,6 @@ const StyledForm = styled.form`
         justify-content: flex-start;
         align-items: center;
         margin-bottom: 20px;
-        & > input {
-            border: 1px solid #000000;
-            border-radius: 4px;
-            margin-right: 14px;
-        }
         & > label {
             font-family: 'Helvetica Neue';
             font-style: normal;
@@ -130,6 +121,9 @@ const StyledForm = styled.form`
         color: #FFFFFF;
         padding: 19px 0px;
         width: 100%;
+        &:disabled {
+            background: #99A9FF;
+        }
     }
 
 `
@@ -151,21 +145,25 @@ const StyledImg = styled.img`
 `
 
 const StyledError = styled.div`
-    background-image: ${errorIcon};
     font-family: 'Helvetica Neue';
+    background-image: url(${errorIcon});
+    background-repeat: no-repeat;
+    background-position: 20px;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
     line-height: 17px;
     color: #000000;
-    background: #F5E9E9;
+    background-color: #F5E9E9;
     border: 1px solid #E26F6F;
     border-radius: 8px;
-    padding: 21px 0px 22px 54px;
+    padding: 22px 0px 20px 54px;
     margin-bottom: 27px;
     display: flex;
     align-items: center;
 `
-export const CustomInput = (props) => {
+
+const CustomInput = (props) => {
     return <StyledInput {...props}/>
 }
+
